@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Where To Buy – Jenny Loves Me</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Philosopher:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+
+<style>
+:root {
+  /* ── Jenny Loves Me Brand Colors ── */
+  /* Primary: PANTONE 1797 C */
+  --rose:        #C8102E;
+  --rose-dark:   #9e0d24;
+  --rose-deep:   #72091a;
+  --rose-light:  #fae8eb;
+  --rose-pale:   #fff3f5;
+  --rose-mid:    #edadb5;
+  --green:       #5a6e4a;
+  --green-light: #edf2e8;
+  --cream:       #fafafa;
+  --charcoal:    #1a1a1a;
+  --mid:         #5a5a5a;
+  --light:       #9a9a9a;
+  --border:      #e8cdd1;
+  --white:       #ffffff;
+}
+
+@font-face {
+  font-family: 'Optima';
+  src: url('OptimaLTPro-Roman.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Optima';
+  src: url('OptimaLTPro-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--charcoal);height:100vh;height:100dvh;display:flex;flex-direction:column}
+
+/* HEADER */
+.header{background:var(--white);border-bottom:1px solid var(--border);padding:0 36px;height:62px;display:flex;align-items:center;gap:18px;flex:none;z-index:1000;box-shadow:0 1px 20px rgba(163,77,100,0.08)}
+.logo{font-family:'Philosopher',serif;font-size:1.45rem;font-weight:700;color:var(--rose-dark);text-decoration:none;letter-spacing:0.02em;white-space:nowrap}
+.logo em{font-style:italic;font-weight:400;color:var(--rose)}
+.header-divider{width:1px;height:24px;background:var(--border);flex-shrink:0}
+.header-sub{font-size:0.78rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--light)}
+.header-badge{margin-left:auto;background:var(--rose-light);color:var(--rose-dark);padding:5px 14px;border-radius:100px;font-size:0.75rem;font-weight:600;letter-spacing:0.05em;white-space:nowrap}
+
+/* HERO */
+.hero{background:var(--rose-dark);background-image:radial-gradient(ellipse at 20% 50%,rgba(200,16,46,0.5) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(114,9,26,0.8) 0%,transparent 50%),linear-gradient(135deg,#C8102E 0%,#72091a 100%);color:white;text-align:center;padding:10px 24px 46px;position:relative;overflow:hidden;flex:none}
+.hero::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:32px;background:var(--cream);clip-path:ellipse(55% 100% at 50% 100%)}
+.hero-eyebrow{font-size:0.72rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;opacity:0.65;margin-bottom:12px}
+.hero h1{font-family:'Optima','Philosopher',serif;font-size:clamp(2.2rem,5vw,3.2rem);font-weight:600;line-height:1.1;margin-bottom:2px;letter-spacing:-0.01em}
+.hero h1 em{font-style:italic;font-weight:400}
+.hero p{font-size:0.92rem;opacity:0.75;font-weight:300;max-width:40rem;margin:4px auto 0;line-height:1.4}
+.hero p span{white-space:nowrap}
+
+/* CONTROLS */
+.controls{background:var(--white);border-bottom:1px solid var(--border);padding:12px 28px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;flex:none;z-index:999;box-shadow:0 2px 12px rgba(0,0,0,0.04)}
+.search-wrap{position:relative;flex:1;min-width:180px;max-width:280px}
+.search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--light);pointer-events:none;width:14px;height:14px}
+.search-input{width:100%;padding:8px 12px 8px 34px;border:1.5px solid var(--border);border-radius:8px;font-family:'Inter',sans-serif;font-size:0.82rem;color:var(--charcoal);background:var(--rose-pale);outline:none;transition:border-color 0.2s,background 0.2s}
+.search-input:focus{border-color:var(--rose);background:var(--white)}
+.search-input::placeholder{color:var(--light)}
+.controls-sep{width:1px;height:20px;background:var(--border);flex-shrink:0}
+.filter-btn{padding:7px 15px;border-radius:100px;border:1.5px solid var(--border);background:var(--white);font-family:'Inter',sans-serif;font-size:0.75rem;font-weight:500;letter-spacing:0.04em;color:var(--mid);cursor:pointer;transition:all 0.18s;white-space:nowrap}
+.filter-btn:hover{border-color:var(--rose);color:var(--rose)}
+.filter-btn.active{background:var(--rose-dark);border-color:var(--rose-dark);color:white}
+
+/* LAYOUT */
+.layout{display:grid;grid-template-columns:360px 1fr;flex:1;min-height:0}
+
+/* SIDEBAR */
+.sidebar{background:var(--white);border-right:1px solid var(--border);overflow:hidden;display:flex;flex-direction:column;min-height:0}
+.sidebar-hd{padding:14px 18px 12px;border-bottom:1.5px solid #e4c5cb;background:var(--white);z-index:2;display:flex;align-items:center;justify-content:space-between;flex:none}
+.sidebar-hd-title{font-family:'Philosopher',serif;font-size:0.95rem;font-weight:600;color:var(--charcoal)}
+.sidebar-hd-count{font-size:0.72rem;color:var(--light);font-weight:500}
+.store-list{flex:1;min-height:0;overflow-y:auto;border-bottom:1.5px solid #e4c5cb}
+.store-list::-webkit-scrollbar{width:3px}
+.store-list::-webkit-scrollbar-thumb{background:var(--rose-mid);border-radius:3px}
+
+/* STORE CARD */
+.store-card{padding:14px 18px;border-bottom:1px solid #f5ecef;cursor:pointer;transition:background 0.15s;display:flex;gap:12px;align-items:flex-start}
+.store-card:hover{background:var(--rose-pale)}
+.store-card.active{background:var(--rose-light);border-left:3px solid var(--rose);padding-left:15px}
+.store-num{min-width:24px;height:24px;border-radius:50%;background:var(--rose-light);color:var(--rose-dark);font-size:0.65rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;transition:all 0.2s}
+.store-card.active .store-num{background:var(--rose);color:white}
+.store-info{flex:1;min-width:0}
+.store-name{font-family:'Philosopher',serif;font-weight:600;font-size:0.97rem;color:var(--charcoal);margin-bottom:3px;line-height:1.3}
+.store-addr{font-size:0.75rem;color:var(--mid);line-height:1.45;margin-bottom:4px}
+.store-phone{font-size:0.72rem;color:var(--light);margin-bottom:6px}
+.store-tags{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:7px}
+.tag{font-size:0.65rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;padding:2px 8px;border-radius:100px}
+.tag-region{background:var(--green-light);color:var(--green)}
+.tag-soon{background:#f0eeee;color:#aaa}
+.store-actions{display:flex;gap:6px;flex-wrap:wrap}
+.btn-shop{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;background:var(--rose-dark);color:white;border-radius:100px;font-family:'Inter',sans-serif;font-size:0.7rem;font-weight:600;letter-spacing:0.04em;text-decoration:none;transition:background 0.18s,transform 0.15s}
+.btn-shop:hover{background:var(--rose-deep);transform:translateY(-1px)}
+.btn-dir{display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border:1.5px solid var(--border);color:var(--mid);border-radius:100px;font-family:'Inter',sans-serif;font-size:0.7rem;font-weight:500;text-decoration:none;transition:all 0.18s;background:transparent}
+.btn-dir:hover{border-color:var(--rose);color:var(--rose)}
+
+/* LOADING / ERROR / NO RESULTS */
+.status-msg{padding:48px 24px;text-align:center;color:var(--light)}
+.status-msg svg{margin-bottom:14px;opacity:0.4;display:block;margin-left:auto;margin-right:auto}
+.status-msg p{font-size:0.85rem;line-height:1.6}
+.spinner{width:36px;height:36px;border:3px solid var(--rose-light);border-top-color:var(--rose);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 14px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* MAP */
+#map{width:100%;height:100%;z-index:1;background:#e7eaee}
+
+/* POPUP */
+.leaflet-popup-content-wrapper{border-radius:16px !important;box-shadow:0 12px 40px rgba(163,77,100,0.2) !important;padding:0 !important;overflow:hidden;border:none !important}
+.leaflet-popup-content{margin:0 !important;width:270px !important}
+.leaflet-popup-tip{background:var(--rose-pale) !important}
+.popup-head{background:var(--rose-dark);padding:14px 16px 12px;color:white}
+.popup-head-name{font-family:'Philosopher',serif;font-size:1.05rem;font-weight:600;line-height:1.25;margin-bottom:2px}
+.popup-head-region{font-size:0.68rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;opacity:0.65}
+.popup-body{padding:12px 16px 8px;background:var(--white)}
+.popup-addr{font-size:0.78rem;color:var(--mid);line-height:1.4;margin-bottom:6px}
+.popup-phone{font-size:0.74rem;color:var(--light)}
+.popup-foot{padding:10px 16px 14px;background:var(--rose-pale);border-top:1px solid var(--border);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+/* REFRESH BADGE */
+.refresh-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;background:transparent;border:1.5px solid var(--border);border-radius:100px;font-family:'Inter',sans-serif;font-size:0.72rem;color:var(--light);cursor:pointer;transition:all 0.18s;margin-left:8px}
+.refresh-btn:hover{border-color:var(--rose);color:var(--rose)}
+.refresh-btn svg{transition:transform 0.4s}
+.refresh-btn.spinning svg{animation:spin 0.8s linear infinite}
+
+/* LAST UPDATED */
+.last-updated{font-size:0.68rem;color:var(--light);margin-left:4px;font-style:italic}
+
+/* Responsive */
+.map-pane{position:relative;min-width:0;min-height:0}
+#map{position:absolute;inset:0}
+
+#bottom-stack{
+  position:absolute;left:12px;right:12px;bottom:12px;z-index:500;
+  display:flex;justify-content:center;pointer-events:none;
+}
+#map-toolbar{
+  pointer-events:auto;display:flex;align-items:stretch;flex-wrap:nowrap;gap:2px;
+  max-width:100%;overflow-x:auto;overflow-y:visible;scrollbar-width:thin;
+  background:#fff;border:1px solid var(--border);border-radius:18px;
+  box-shadow:0 8px 28px rgba(114,9,26,0.12);padding:6px 8px;
+}
+.tool-sep{width:1px;background:var(--border);margin:8px 6px;flex-shrink:0}
+.tool{
+  appearance:none;border:none;background:transparent;min-width:58px;padding:6px 10px;border-radius:12px;
+  cursor:pointer;color:var(--mid);display:flex;flex-direction:column;align-items:center;gap:3px;
+  font-family:'Inter',sans-serif;flex-shrink:0;
+}
+.tool svg{width:18px;height:18px;fill:currentColor;pointer-events:none}
+.tool span{font-size:10px;font-weight:600;letter-spacing:0.02em;white-space:nowrap}
+.tool:hover{background:var(--rose-pale);color:var(--rose)}
+.tool.active{background:var(--rose-light);color:var(--rose-dark)}
+.map-flyout{
+  position:absolute;z-index:510;display:none;min-width:148px;padding:6px;
+  background:#fff;border:1px solid var(--border);border-radius:14px;
+  box-shadow:0 12px 32px rgba(114,9,26,0.16);
+}
+.map-flyout.open{display:block}
+.flyout-item{
+  padding:8px 12px;border-radius:10px;font-family:'Inter',sans-serif;font-size:0.78rem;font-weight:600;
+  color:var(--charcoal);cursor:pointer;
+}
+.flyout-item:hover{background:var(--rose-pale);color:var(--rose)}
+.flyout-item.active{background:var(--rose-dark);color:#fff}
+.map-pane .leaflet-bottom.leaflet-left{left:10px;bottom:8px}
+.map-pane .leaflet-bottom.leaflet-right{right:0;bottom:0}
+.leaflet-control-scale-line{
+  border-color:var(--rose-dark) !important;border-width:2px !important;
+  background:rgba(255,255,255,0.92);color:var(--charcoal);
+  font-family:'Inter',sans-serif !important;
+}
+
+@media(max-width:780px){
+  .layout{grid-template-columns:1fr;grid-template-rows:minmax(0,1fr) minmax(0,1fr)}
+  .map-pane{order:-1}
+  .tool{min-width:44px;padding:6px 8px}
+  .tool span{display:none}
+  .sidebar{min-height:0;height:auto;overflow:hidden}
+  .header{padding:0 16px}
+  .controls{padding:10px 14px}
+  .hero{padding:8px 16px 44px}
+  .header-divider,.header-sub{display:none}
+}
+
+.leaflet-container a.leaflet-popup-close-button {
+  color: #fff;
+}
+
+.leaflet-container a.btn-shop {
+  color: #fff;
+}
+
+.leaflet-container { background:#e7eaee; font-family:'Inter',sans-serif; }
+.leaflet-control-attribution { font-size:10px; background:rgba(255,255,255,0.85); }
+.leaflet-bar {
+  border:none !important;
+  border-radius:8px !important;
+  box-shadow:0 1px 4px rgba(16,24,32,0.14) !important;
+  overflow:hidden;
+}
+.leaflet-bar a { border:none !important; color:var(--charcoal) !important; background:#fff; }
+.leaflet-bar a:hover { background:var(--rose-pale); color:var(--rose) !important; }
+
+/* PINS — Jenny red, reference pulse */
+.pin-icon, .cluster-icon { background:transparent; border:none; }
+.pin-icon { overflow:visible !important; }
+.pin { position:relative; width:28px; height:28px; }
+.pin .dot {
+  position:absolute; left:4px; top:4px; width:16px; height:16px; border-radius:50%;
+  background:var(--rose); border:2.5px solid #fff;
+  box-shadow:0 1px 5px rgba(158,13,36,0.35); z-index:2;
+}
+.pin.is-active .dot { background:var(--rose-dark); width:18px; height:18px; left:3px; top:3px; }
+.pin .pulse {
+  position:absolute; left:4px; top:4px; width:16px; height:16px; border-radius:50%;
+  background:var(--rose); z-index:1; pointer-events:none;
+  animation:jenny-wave 2.6s ease-out infinite;
+}
+.pin.is-active .pulse { background:var(--rose-dark); }
+.pin .pulse.delay { animation-delay:1.3s; }
+@keyframes jenny-wave {
+  0% { transform:scale(0.7); opacity:0.5; }
+  100% { transform:scale(3.5); opacity:0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pin .pulse { animation:none; opacity:0.22; transform:scale(2.2); }
+}
+
+.cluster-bubble {
+  width:46px; height:46px; border-radius:50%; background:var(--rose); color:#fff;
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Inter',sans-serif; font-weight:600; font-size:16px; letter-spacing:-0.02em;
+  box-shadow:0 0 0 7px rgba(200,16,46,0.16), 0 6px 16px rgba(114,9,26,0.18);
+}
+
+</style>
+</head>
+<body>
+
+<header class="header">
+  <a class="logo" href="https://jennyloves.me">Jenny <em>Loves</em> Me</a>
+  <div class="header-divider"></div>
+  <span class="header-sub">Store Locator</span>
+  <div class="header-badge" id="headerCount">Loading…</div>
+</header>
+
+<div class="hero">
+  <div class="hero-eyebrow">Interactive Map</div>
+  <h1>Find <em>Jenny's</em> Near You</h1>
+  <p>Available at select licensed NY dispensaries. <span>Find one close to you.</span></p>
+</div>
+
+<div class="controls">
+  <div class="search-wrap">
+    <svg class="search-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input class="search-input" type="text" id="searchInput" placeholder="Search store or neighborhood…"/>
+  </div>
+  <div class="controls-sep"></div>
+  <button class="filter-btn active" data-region="all">All NY</button>
+  <button class="filter-btn" data-region="Manhattan">Manhattan</button>
+  <button class="filter-btn" data-region="Brooklyn">Brooklyn</button>
+  <button class="filter-btn" data-region="Bronx">Bronx</button>
+  <button class="filter-btn" data-region="Queens">Queens</button>
+  <button class="filter-btn" data-region="Staten Island">Staten Island</button>
+  <button class="filter-btn" data-region="upstate">Upstate NY</button>
+  <button class="filter-btn" data-region="li">Long Island</button>
+  <button class="refresh-btn" id="refreshBtn" title="Reload store data from spreadsheet">
+    <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+    Refresh
+  </button>
+  <span class="last-updated" id="lastUpdated"></span>
+</div>
+
+<div class="layout">
+  <div class="sidebar">
+    <div class="sidebar-hd">
+      <span class="sidebar-hd-title">Dispensary Locations</span>
+      <span class="sidebar-hd-count" id="sidebarCount">Loading…</span>
+    </div>
+    <div class="store-list" id="storeList">
+      <div class="status-msg">
+        <div class="spinner"></div>
+        <p>Loading store locations…</p>
+      </div>
+    </div>
+  </div>
+  <div class="map-pane">
+    <div id="map"></div>
+    <div id="bottom-stack">
+      <nav id="map-toolbar" aria-label="Map tools">
+        <button class="tool" id="btn-home" type="button" aria-label="Home">
+          <svg viewBox="0 0 24 24"><path d="M12 3 2.4 11.6h2.8V21h5.5v-6.4h3.6V21h5.5v-9.4h2.8L12 3z"/></svg>
+          <span>Home</span>
+        </button>
+        <button class="tool" id="btn-zoom-in" type="button" aria-label="Zoom in">
+          <svg viewBox="0 0 24 24"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6V5z"/></svg>
+          <span>Zoom in</span>
+        </button>
+        <button class="tool" id="btn-zoom-out" type="button" aria-label="Zoom out">
+          <svg viewBox="0 0 24 24"><path d="M5 11h14v2H5v-2z"/></svg>
+          <span>Zoom out</span>
+        </button>
+        <button class="tool" id="btn-fullscreen" type="button" aria-label="Fullscreen" aria-pressed="false">
+          <svg viewBox="0 0 24 24"><path d="M3 3h7v2H5v5H3V3zm11 0h7v7h-2V5h-5V3zM3 14h2v5h5v2H3v-7zm16 0h2v7h-7v-2h5v-5z"/></svg>
+          <span>Fullscreen</span>
+        </button>
+        <div class="tool-sep" aria-hidden="true"></div>
+        <button class="tool" id="btn-basemap" type="button" aria-label="Basemap" aria-expanded="false" aria-controls="basemap-menu">
+          <svg viewBox="0 0 24 24"><path d="M3 5.5 12 2l9 3.5V19l-9 3.5L3 19V5.5zm2 1.7v10.3l7 2.7V10L5 7.2zm9 2.8v10.2l7-2.7V7.2L14 10z"/></svg>
+          <span>Basemap</span>
+        </button>
+        <button class="tool active" id="btn-scale" type="button" aria-label="Scale" aria-pressed="true">
+          <svg viewBox="0 0 24 24"><path d="M3 10h18v4H3v-4zm2 1v2h1v-2H5zm3 0v2h2v-2H8zm4 0v2h1v-2h-1zm3 0v2h2v-2h-2zm4 0v2h1v-2h-1z"/></svg>
+          <span>Scale</span>
+        </button>
+      </nav>
+    </div>
+    <div class="map-flyout" id="basemap-menu">
+      <div class="flyout-item active" data-basemap="gray">Gray</div>
+      <div class="flyout-item" data-basemap="streets">Streets</div>
+      <div class="flyout-item" data-basemap="satellite">Satellite</div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js"></script>
+<script>
+// ─────────────────────────────────────────────────────────────
+// GOOGLE SHEET CONFIG
+// Sheet ID from Jennifer's shared link
+// The sheet must be shared as "Anyone with the link can view"
+// ─────────────────────────────────────────────────────────────
+const SHEET_ID  = '1FvIMCtXSfY2ZmsJLofujGtxb_67WbFX00kIeDGN1OFE';
+const SHEET_TAB = 'Sheet1'; // Change if her tab has a different name
+
+// Google Sheets public CSV export URL (no API key needed!)
+const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_TAB)}`;
+
+// ─────────────────────────────────────────────────────────────
+// REGION MAPPING
+// Jennifer uses city/area names — we map them to filter keys
+// ─────────────────────────────────────────────────────────────
+const REGION_MAP = {
+  'manhattan':           { label:'Manhattan',     filter:'Manhattan' },
+  'brooklyn':            { label:'Brooklyn',      filter:'Brooklyn' },
+  'bronx':               { label:'The Bronx',     filter:'Bronx' },
+  'queens':              { label:'Queens',        filter:'Queens' },
+  'staten island':       { label:'Staten Island', filter:'Staten Island' },
+  // Upstate cities
+  'albany':              { label:'Albany (Upstate)',   filter:'upstate' },
+  'buffalo':             { label:'Buffalo (Upstate)',  filter:'upstate' },
+  'rochester':           { label:'Rochester (Upstate)',filter:'upstate' },
+  'hudson':              { label:'Hudson (Upstate)',   filter:'upstate' },
+  'woodstock':           { label:'Woodstock (Upstate)',filter:'upstate' },
+  'westchester county':  { label:'Westchester',        filter:'upstate' },
+  'westhester county':   { label:'Westchester',        filter:'upstate' }, // typo in sheet
+  'westchester':         { label:'Westchester',        filter:'upstate' },
+  'upstate':             { label:'Upstate NY',         filter:'upstate' },
+  // Long Island
+  'farmingdale, long island': { label:'Long Island',  filter:'li' },
+  'stony brook, long island': { label:'Long Island',  filter:'li' },
+  'long island':              { label:'Long Island',  filter:'li' },
+  'li':                       { label:'Long Island',  filter:'li' },
+};
+
+function getRegionMeta(rawRegion) {
+  if (!rawRegion) return { label: 'New York', filter: 'all' };
+  const key = rawRegion.trim().toLowerCase();
+  return REGION_MAP[key] || { label: rawRegion.trim(), filter: 'upstate' };
+}
+
+// ─────────────────────────────────────────────────────────────
+// GEOCODE CACHE — lat/lng for each store address
+// We keep these hardcoded so we never need a geocoding API.
+// Jennifer can add new stores and we geocode them once manually.
+// ─────────────────────────────────────────────────────────────
+const GEO = {
+  "Bayside Cannabis Dispensary":      [40.7365,-73.7580],
+  "BX Buddiez":                       [40.8092,-73.9198],
+  "By Any Other Name":                [40.6800,-73.9560],
+  "Canna Buddha":                     [40.7617,-73.7730],
+  "CannaFamily Dispensary":           [40.6578,-73.8454],
+  "Carnegie Hill Dispensary":         [40.7830,-73.9517],
+  "Chelsea Cannabis":                 [40.7396,-74.0001],
+  "Culture House, Midtown Manhattan": [40.7484,-73.9967],
+  "Culture House, Greenpoint Brooklyn":[40.7237,-73.9513],
+  "Cussin's Cannabis":                [42.8110,-73.9351],
+  "Devil's Lettuce":                  [42.8364,-78.7525],
+  "Dispo Store":                      [40.6681,-73.9893],
+  "Elevation HQ":                     [40.7576,-73.9903],
+  "Emerald Dispensary, Bushwick":     [40.6990,-73.9257],
+  "Emerald Dispensary, Manhattan":    [40.7750,-73.9593],
+  "Emerald Dispensary, Carroll Gardens":[40.6789,-73.9997],
+  "EHS, Jamaica, Queens":             [40.6991,-73.8062],
+  "EHS, Rosedale":                    [40.6647,-73.7347],
+  "Flower City":                      [43.0005,-77.4080],
+  "Freshly Baked NYC, Bronx":         [40.8550,-73.8836],
+  "Freshly Baked NYC, Manhattan":     [40.7636,-73.9785],
+  "Goldleaf":                         [42.2537,-73.7929],
+  "Grow Together Dispensary":         [40.6117,-73.9635],
+  "Happy Days Dispensary":            [40.7320,-73.4467],
+  "Herbal Woodstock aka Plant Meets Public LLC":[42.0404,-74.1165],
+  "High Tidez":                       [40.5756,-73.9818],
+  "House of Strains aka Beast Coast Group":[40.7614,-73.8259],
+  "KushMart, King's Highway, Brooklyn":[40.6087,-73.9573],
+  "KushMart, Ave. U, Brooklyn":       [40.5994,-73.9458],
+  "KushMart, Lackawanna":             [42.8273,-78.8270],
+  "Kushmart, Lancaster":              [42.9006,-78.6700],
+  "Lenox Hill Cannabis":              [40.7693,-73.9574],
+  "Liberty Buds Dispensary aka Weeds R Us LLC":[40.7624,-73.9604],
+  "Lighthouse Cannabis":              [40.7197,-74.0017],
+  "MaryJane Dispensary":              [40.7654,-73.9657],
+  "NugHub Dispensary":                [40.6274,-74.1300],
+  "OC Dispensary":                    [40.6751,-73.9584],
+  "Planet Nugg":                      [40.7214,-73.4409],
+  "Purple Owl Dispensary":            [40.9528,-73.7368],
+  "Purple Plains Dispensary, dba SMMB INC.":[41.2101,-73.5727],
+  "QUBE":                             [40.7531,-73.9877],
+  "Sage Seeds":                       [40.7247,-73.7143],
+  "Sanctuary Garden":                 [40.7936,-73.9726],
+  "Smacked-Village":                  [40.7282,-74.0004],
+  "Smoking Scholars":                 [40.8692,-73.8643],
+  "Stash Master":                     [40.6903,-73.9244],
+  "Strong Strains":                   [40.9280,-73.1100],
+  "Sweetlife":                        [40.7754,-73.9484],
+  "Terp Bros":                        [40.7726,-73.9126],
+  "THC Shop, Rosedale":               [40.6640,-73.7388],
+  "THC Shop, Brooklyn":               [40.6010,-74.0052],
+  "Twenty8gramz":                     [40.5989,-73.9379],
+  "Verdi Dispensary - Park Slope, Brooklyn":[40.6677,-73.9832],
+  "Verdi Dispensary, Chelsea, Manhattan":[40.7441,-73.9970],
+  "Weedside":                         [40.7451,-73.9039],
+  "Yerba Buena aka Astro Management": [40.6888,-73.9905],
+};
+
+// Default fallback coords (NYC center) for any new stores without geocode
+const NYC_CENTER = [40.7128, -74.0060];
+
+const GEO_BY_NAME = Object.create(null);
+Object.keys(GEO).forEach((name) => {
+  GEO_BY_NAME[name.trim().toLowerCase().replace(/\s+/g, ' ')] = GEO[name];
+});
+
+function builtinCoords(name) {
+  if (!name) return null;
+  if (GEO[name]) return GEO[name];
+  return GEO_BY_NAME[name.trim().toLowerCase().replace(/\s+/g, ' ')] || null;
+}
+
+// ─────────────────────────────────────────────────────────────
+// MAP INIT
+// ─────────────────────────────────────────────────────────────
+const map = L.map('map', {
+  center:[40.93,-73.95],
+  zoom:9,
+  zoomControl:false,
+  minZoom:5,
+  maxZoom:16
+});
+
+map.createPane('labels');
+map.getPane('labels').style.zIndex = 350;
+map.getPane('labels').style.pointerEvents = 'none';
+
+const BASEMAPS = {
+  gray: {
+    base: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+    labels: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}',
+    attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'
+  },
+  streets: {
+    base: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}',
+    labels: null,
+    attribution: 'Tiles &copy; Esri'
+  },
+  satellite: {
+    base: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    labels: 'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
+    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics'
+  }
+};
+
+const MAP_UI_KEY = 'jenny_map_ui_v1';
+let baseLayer = null;
+let labelLayer = null;
+let scaleControl = null;
+
+function loadMapUi() {
+  try { return JSON.parse(localStorage.getItem(MAP_UI_KEY) || '{}') || {}; }
+  catch (e) { return {}; }
+}
+function saveMapUi(patch) {
+  try { localStorage.setItem(MAP_UI_KEY, JSON.stringify(Object.assign(loadMapUi(), patch))); }
+  catch (e) {}
+}
+
+function setBasemap(id) {
+  const spec = BASEMAPS[id] ? BASEMAPS[id] : BASEMAPS.gray;
+  const chosen = BASEMAPS[id] ? id : 'gray';
+  if (baseLayer) map.removeLayer(baseLayer);
+  if (labelLayer) map.removeLayer(labelLayer);
+  baseLayer = L.tileLayer(spec.base, { maxZoom: 16, attribution: spec.attribution }).addTo(map);
+  baseLayer.bringToBack();
+  labelLayer = spec.labels
+    ? L.tileLayer(spec.labels, { maxZoom: 16, pane: 'labels' }).addTo(map)
+    : null;
+  document.querySelectorAll('#basemap-menu [data-basemap]').forEach((el) => {
+    el.classList.toggle('active', el.dataset.basemap === chosen);
+  });
+  saveMapUi({ basemap: chosen });
+}
+
+function setScaleVisible(on) {
+  const container = scaleControl && scaleControl.getContainer();
+  if (container) container.style.display = on ? '' : 'none';
+  const btn = document.getElementById('btn-scale');
+  if (btn) {
+    btn.classList.toggle('active', !!on);
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  }
+  saveMapUi({ scaleOn: !!on });
+}
+
+function closeBasemapMenu() {
+  const menu = document.getElementById('basemap-menu');
+  const btn = document.getElementById('btn-basemap');
+  if (menu) menu.classList.remove('open');
+  if (btn) {
+    btn.classList.remove('active');
+    btn.setAttribute('aria-expanded', 'false');
+  }
+}
+
+function positionBasemapMenu() {
+  const menu = document.getElementById('basemap-menu');
+  const btn = document.getElementById('btn-basemap');
+  const pane = document.querySelector('.map-pane');
+  if (!menu || !btn || !pane) return;
+  const wrap = pane.getBoundingClientRect();
+  const r = btn.getBoundingClientRect();
+  const width = menu.offsetWidth || 148;
+  let left = r.left - wrap.left + r.width / 2 - width / 2;
+  left = Math.max(12, Math.min(left, wrap.width - width - 12));
+  menu.style.left = left + 'px';
+  menu.style.bottom = (wrap.bottom - r.top + 10) + 'px';
+}
+
+function toggleBasemapMenu() {
+  const menu = document.getElementById('basemap-menu');
+  const btn = document.getElementById('btn-basemap');
+  if (!menu || !btn) return;
+  const willOpen = !menu.classList.contains('open');
+  closeBasemapMenu();
+  if (!willOpen) return;
+  menu.classList.add('open');
+  btn.classList.add('active');
+  btn.setAttribute('aria-expanded', 'true');
+  positionBasemapMenu();
+}
+
+const mapUi = loadMapUi();
+setBasemap(mapUi.basemap || 'gray');
+scaleControl = L.control.scale({ imperial: true, metric: false, position: 'bottomleft', maxWidth: 120 }).addTo(map);
+setScaleVisible(mapUi.scaleOn !== false);
+
+function makeIcon(active=false) {
+  return L.divIcon({
+    className: 'pin-icon',
+    html: `<div class="pin${active ? ' is-active' : ''}"><span class="pulse"></span><span class="pulse delay"></span><span class="dot"></span></div>`,
+    iconSize: [28, 28],
+    iconAnchor: [14, 14],
+    popupAnchor: [0, -14]
+  });
+}
+
+function createClusterGroup() {
+  const options = {
+    showCoverageOnHover: false,
+    zoomToBoundsOnClick: true,
+    spiderfyOnMaxZoom: true,
+    maxClusterRadius: 50,
+    disableClusteringAtZoom: 16,
+    spiderLegPolylineOptions: { weight: 1.5, color: '#8b95a1', opacity: 0.9 },
+    spiderfyDistanceMultiplier: 1.15,
+    spiderfyShapePositions: function (count, center) {
+      const reach = count === 2 ? 58 : 50;
+      const start = count === 2 ? 0 : -Math.PI / 2;
+      const step = (Math.PI * 2) / count;
+      const points = [];
+      for (let i = 0; i < count; i++) {
+        const angle = start + i * step;
+        points.push(L.point(center.x + Math.cos(angle) * reach, center.y + Math.sin(angle) * reach));
+      }
+      return points;
+    },
+    iconCreateFunction: function (cluster) {
+      const count = cluster.getChildCount();
+      return L.divIcon({
+        className: 'cluster-icon',
+        html: `<div class="cluster-bubble"><span>${count}</span></div>`,
+        iconSize: [46, 46],
+        iconAnchor: [23, 23]
+      });
+    }
+  };
+  return L.markerClusterGroup ? L.markerClusterGroup(options) : L.layerGroup();
+}
+
+const clusterGroup = createClusterGroup();
+map.addLayer(clusterGroup);
+window.addEventListener('resize', () => map.invalidateSize());
+requestAnimationFrame(() => map.invalidateSize());
+
+// ─────────────────────────────────────────────────────────────
+// CSV PARSER
+// Parses Google Sheets CSV export into row objects
+// Sheet layout: rows of 5 fields: Name, Address, Phone,
+//               Jenny's Products, Region — with blank rows between stores
+// ─────────────────────────────────────────────────────────────
+function parseCSV(text) {
+  // Split into lines, handle \r\n and \n
+  const lines = text.split(/\r?\n/);
+  const rows = lines.map(line => {
+    // Handle quoted fields (CSV standard)
+    const result = [];
+    let field = '';
+    let inQuotes = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') {
+        if (inQuotes && line[i+1] === '"') { field += '"'; i++; }
+        else inQuotes = !inQuotes;
+      } else if (ch === ',' && !inQuotes) {
+        result.push(field.trim());
+        field = '';
+      } else {
+        field += ch;
+      }
+    }
+    result.push(field.trim());
+    return result;
+  });
+  return rows;
+}
+
+function extractStoresRaw(rows) {
+  // Parse sheet rows into plain store objects (no coordinates yet)
+  const stores = [];
+  let current = null;
+
+  for (const row of rows) {
+    const label = (row[0] || '').trim().toLowerCase();
+    const value = (row[1] || '').trim();
+
+    if (!label && !value) {
+      if (current && current.name) { stores.push(current); current = null; }
+      continue;
+    }
+    if (label === 'name') {
+      if (current && current.name) stores.push(current);
+      current = { name: value, address: '', phone: '', link: '', region: '' };
+    } else if (current) {
+      if (label === 'address') {
+        current.address = value.replace(/^address:\s*/i,'').trim();
+      } else if (label === 'phone') {
+        current.phone = value
+          .replace(/^phone\s*\/\s*mobile:\s*/i,'')
+          .replace(/^phone:\s*/i,'')
+          .replace(/^mobile:\s*/i,'')
+          .replace(/\s*\|.*$/,'')
+          .replace(/^—$/,'')
+          .trim();
+      } else if (label === "jenny's products") {
+        current.link = value.startsWith('http') || value.startsWith('www') ? value : '';
+      } else if (label === 'region') {
+        current.region = value;
+      }
+    }
+  }
+  if (current && current.name) stores.push(current);
+  return stores.filter(s => s.name);
+}
+
+// ─────────────────────────────────────────────────────────────
+// COORDINATE CACHE
+// Built-in GEO hits are instant. New addresses are geocoded once
+// through Nominatim and kept in localStorage, so the next visit
+// does not wait on the geocoder again. A snapshot of the last
+// good store list paints the map before the sheet responds.
+// ─────────────────────────────────────────────────────────────
+const GEO_CACHE_KEY = 'jenny_geocache_v1';
+const SNAPSHOT_KEY = 'jenny_store_snapshot_v1';
+const SESSION_GEO_KEY = 'jenny_geocache';
+
+function addressKey(address) {
+  return (address || '').trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+function lookupCachedCoords(address, cache) {
+  if (!address || !cache) return null;
+  const hit = cache[address.trim()] || cache[addressKey(address)];
+  if (hit && hit.length === 2 && Number.isFinite(hit[0]) && Number.isFinite(hit[1])) return hit;
+  return null;
+}
+
+function loadGeoCache() {
+  let cache = {};
+  try { cache = JSON.parse(localStorage.getItem(GEO_CACHE_KEY) || '{}') || {}; }
+  catch (e) { cache = {}; }
+  try {
+    const session = JSON.parse(sessionStorage.getItem(SESSION_GEO_KEY) || '{}') || {};
+    cache = Object.assign({}, session, cache);
+  } catch (e) {}
+  return cache;
+}
+
+function saveGeoCache(cache) {
+  try { localStorage.setItem(GEO_CACHE_KEY, JSON.stringify(cache)); }
+  catch (e) {}
+}
+
+function loadSnapshot() {
+  try {
+    const data = JSON.parse(localStorage.getItem(SNAPSHOT_KEY) || 'null');
+    if (!data || !Array.isArray(data.stores)) return { stores: [], savedAt: 0 };
+    const stores = data.stores.filter((s) => s && s.name && Number.isFinite(s.lat) && Number.isFinite(s.lng));
+    return { stores, savedAt: data.savedAt || 0 };
+  } catch (e) {
+    return { stores: [], savedAt: 0 };
+  }
+}
+
+function saveSnapshot(list) {
+  try {
+    const saved = list
+      .filter((s) => s && s.name && !s.geocodeFailed && Number.isFinite(s.lat) && Number.isFinite(s.lng))
+      .map((s) => ({
+        name: s.name,
+        address: s.address || '',
+        phone: s.phone || '',
+        link: s.link || '',
+        region: s.region || '',
+        lat: s.lat,
+        lng: s.lng
+      }));
+    localStorage.setItem(SNAPSHOT_KEY, JSON.stringify({ savedAt: Date.now(), stores: saved }));
+  } catch (e) {}
+}
+
+function resolveCoords(store, cache) {
+  const builtin = builtinCoords(store.name);
+  if (builtin) return Object.assign({}, store, { lat: builtin[0], lng: builtin[1], geocodeFailed: false });
+  const hit = lookupCachedCoords(store.address, cache);
+  if (hit) return Object.assign({}, store, { lat: hit[0], lng: hit[1], geocodeFailed: false });
+  return null;
+}
+
+async function geocodeAddress(address, cache) {
+  const existing = lookupCachedCoords(address, cache);
+  if (existing) return existing;
+  const url = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=us&q=' + encodeURIComponent(address);
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 8000);
+  try {
+    // Browsers forbid a custom User-Agent on fetch, so the header is omitted.
+    const resp = await fetch(url, {
+      headers: { 'Accept-Language': 'en' },
+      signal: ctrl.signal
+    });
+    const data = await resp.json();
+    if (data && data[0]) {
+      const coords = [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+      cache[addressKey(address)] = coords;
+      saveGeoCache(cache);
+      return coords;
+    }
+  } catch (e) {
+    console.warn('Geocode failed for:', address, e);
+  } finally {
+    clearTimeout(timer);
+  }
+  return null;
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ─────────────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────────────
+let stores    = [];
+let markers   = [];
+let activeIdx = null;
+let currentFilter = 'all';
+let currentSearch = '';
+let geoNote = '';
+let loadGen = 0;
+let suppressPopupReset = false;
+let activateToken = 0;
+
+const regionZoom = {
+  all:           { c:[40.93,-73.95],   z:9  },
+  Manhattan:     { c:[40.754,-73.984], z:13 },
+  Brooklyn:      { c:[40.651,-73.962], z:12 },
+  Bronx:         { c:[40.845,-73.876], z:12 },
+  Queens:        { c:[40.728,-73.800], z:11 },
+  'Staten Island':{ c:[40.580,-74.150],z:12 },
+  upstate:       { c:[42.500,-74.800], z:7  },
+  li:            { c:[40.789,-73.135], z:9  },
+};
+
+function dirLink(s) {
+  return `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(s.address)}`;
+}
+
+// ─────────────────────────────────────────────────────────────
+// RENDER MAP MARKERS
+// ─────────────────────────────────────────────────────────────
+function buildPopup(s) {
+  const rm = getRegionMeta(s.region);
+  const shopBtn = s.link
+    ? `<a href="${s.link}" target="_blank" rel="noopener" class="btn-shop">
+        <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        Shop Jenny's Products
+      </a>`
+    : `<span style="font-size:0.68rem;color:#bbb;font-style:italic">Link coming soon</span>`;
+  return `
+    <div class="popup-head">
+      <div class="popup-head-name">${s.name}</div>
+      <div class="popup-head-region">${rm.label}</div>
+    </div>
+    <div class="popup-body">
+      <div class="popup-addr">${s.address}</div>
+      ${s.phone ? `<div class="popup-phone">📞 ${s.phone}</div>` : ''}
+    </div>
+    <div class="popup-foot">
+      ${shopBtn}
+      <a href="${dirLink(s)}" target="_blank" rel="noopener" class="btn-dir">
+        <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+        Directions
+      </a>
+    </div>`;
+}
+
+function createMarker(s, i) {
+  const marker = L.marker([s.lat, s.lng], { icon: makeIcon(false), title: s.name });
+  marker.bindPopup(buildPopup(s), { maxWidth: 290, minWidth: 270 });
+  marker.on('click', () => activateStore(i));
+  return marker;
+}
+
+function fitVisibleStores() {
+  const q = (currentSearch || '').toLowerCase();
+  const pts = [];
+  stores.forEach((s) => {
+    if (!Number.isFinite(s.lat) || !Number.isFinite(s.lng)) return;
+    const rm = getRegionMeta(s.region);
+    const matchRegion = currentFilter === 'all' || rm.filter === currentFilter;
+    const matchSearch = !q ||
+      s.name.toLowerCase().includes(q) ||
+      (s.address || '').toLowerCase().includes(q) ||
+      (s.region || '').toLowerCase().includes(q);
+    if (matchRegion && matchSearch) pts.push([s.lat, s.lng]);
+  });
+  if (!pts.length) return;
+  map.invalidateSize();
+  map.fitBounds(L.latLngBounds(pts), {
+    paddingTopLeft: [36, 64],
+    paddingBottomRight: [36, 108],
+    maxZoom: 12,
+    animate: true
+  });
+}
+
+function rebuildMarkers() {
+  suppressPopupReset = true;
+  clusterGroup.clearLayers();
+  markers = stores.map((s, i) => createMarker(s, i));
+  if (markers.length) {
+    if (clusterGroup.addLayers) clusterGroup.addLayers(markers);
+    else markers.forEach((marker) => clusterGroup.addLayer(marker));
+  }
+  setTimeout(() => { suppressPopupReset = false; }, 0);
+}
+
+// ─────────────────────────────────────────────────────────────
+// RENDER SIDEBAR LIST
+// ─────────────────────────────────────────────────────────────
+function renderList() {
+  const list    = document.getElementById('storeList');
+  const hCount  = document.getElementById('headerCount');
+  const sbCount = document.getElementById('sidebarCount');
+  const scrollTop = list.scrollTop;
+  list.innerHTML = '';
+
+  const filtered = stores.map((s,i) => ({s,i})).filter(({s}) => {
+    const rm = getRegionMeta(s.region);
+    const matchRegion = currentFilter === 'all' || rm.filter === currentFilter;
+    const q = currentSearch.toLowerCase();
+    const matchSearch = !q ||
+      s.name.toLowerCase().includes(q) ||
+      s.address.toLowerCase().includes(q) ||
+      s.region.toLowerCase().includes(q);
+    return matchRegion && matchSearch;
+  });
+
+  hCount.textContent  = `${filtered.length} Location${filtered.length!==1?'s':''}`;
+  sbCount.textContent = `${filtered.length} of ${stores.length}` + (geoNote ? ` · ${geoNote}` : '');
+
+  stores.forEach((_, i) => {
+    const marker = markers[i];
+    if (!marker) return;
+    const show = filtered.some(f => f.i === i);
+    const shown = clusterGroup.hasLayer(marker);
+    if (show && !shown) clusterGroup.addLayer(marker);
+    else if (!show && shown) clusterGroup.removeLayer(marker);
+  });
+
+  if (filtered.length === 0) {
+    if (!stores.length && geoNote) {
+      list.innerHTML = `<div class="status-msg">
+        <div class="spinner"></div>
+        <p>Locating new stores…<br><small style="opacity:0.7">Each new address is looked up once, then remembered in this browser.</small></p>
+      </div>`;
+    } else {
+      list.innerHTML = `<div class="status-msg">
+        <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.3" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <p>No stores found.<br>Try adjusting your search or filter.</p>
+      </div>`;
+    }
+    list.scrollTop = scrollTop;
+    return;
+  }
+
+  filtered.forEach(({s,i}, idx) => {
+    const rm   = getRegionMeta(s.region);
+    const card = document.createElement('div');
+    card.className = 'store-card' + (activeIdx === i ? ' active' : '');
+    card.id = `card-${i}`;
+
+    const shopBtn = s.link
+      ? `<a href="${s.link}" target="_blank" rel="noopener" class="btn-shop">
+          <svg width="9" height="9" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          Shop Products
+        </a>` : '';
+
+    card.innerHTML = `
+      <div class="store-num">${idx+1}</div>
+      <div class="store-info">
+        <div class="store-name">${s.name}</div>
+        <div class="store-addr">${s.address}</div>
+        ${s.phone ? `<div class="store-phone">${s.phone}</div>` : ''}
+        <div class="store-tags">
+          <span class="tag tag-region">${rm.label}</span>
+          ${!s.link ? '<span class="tag tag-soon">Link coming soon</span>' : ''}
+        </div>
+        <div class="store-actions">
+          ${shopBtn}
+          <a href="${dirLink(s)}" target="_blank" rel="noopener" class="btn-dir">
+            <svg width="9" height="9" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+            Directions
+          </a>
+        </div>
+      </div>`;
+
+    card.addEventListener('click', () => activateStore(i));
+    list.appendChild(card);
+  });
+
+  list.scrollTop = scrollTop;
+}
+
+// ─────────────────────────────────────────────────────────────
+// ACTIVATE STORE
+// ─────────────────────────────────────────────────────────────
+function activateStore(idx) {
+  const marker = markers[idx];
+  const store = stores[idx];
+  if (!marker || !store) return;
+  const token = ++activateToken;
+  suppressPopupReset = true;
+
+  if (activeIdx !== null && markers[activeIdx] && activeIdx !== idx) {
+    markers[activeIdx].setIcon(makeIcon(false));
+    const prev = document.getElementById(`card-${activeIdx}`);
+    if (prev) prev.classList.remove('active');
+  }
+
+  activeIdx = idx;
+  marker.setIcon(makeIcon(true));
+  const card = document.getElementById(`card-${idx}`);
+  if (card) { card.classList.add('active'); card.scrollIntoView({ behavior:'smooth', block:'nearest' }); }
+
+  const reveal = () => {
+    if (token !== activateToken) return;
+    const open = () => {
+      if (token !== activateToken) return;
+      marker.openPopup();
+      setTimeout(() => { if (token === activateToken) suppressPopupReset = false; }, 0);
+    };
+    if (clusterGroup.zoomToShowLayer && clusterGroup.hasLayer(marker)) clusterGroup.zoomToShowLayer(marker, open);
+    else open();
+  };
+
+  const ll = marker.getLatLng();
+  const alreadyThere = map.getZoom() === 16 && map.getCenter().distanceTo(ll) < 2;
+  if (alreadyThere) reveal();
+  else {
+    map.once('moveend', reveal);
+    map.flyTo(ll, 16, { duration: 0.75 });
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// LOAD DATA FROM GOOGLE SHEET
+// ─────────────────────────────────────────────────────────────
+function formatTime(date) {
+  return date.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+}
+
+function setUpdatedLabel(text) {
+  const el = document.getElementById('lastUpdated');
+  if (el) el.textContent = text;
+}
+
+async function geocodePending(pending, cache, gen) {
+  for (let i = 0; i < pending.length; i++) {
+    if (gen !== loadGen) return;
+    if (i > 0) await sleep(1100);
+    if (gen !== loadGen) return;
+    const s = pending[i];
+    const coords = await geocodeAddress(s.address, cache);
+    if (gen !== loadGen) return;
+    const success = !!coords;
+    stores.push(Object.assign({}, s, {
+      lat: success ? coords[0] : NYC_CENTER[0],
+      lng: success ? coords[1] : NYC_CENTER[1],
+      isNew: true,
+      geocodeFailed: !success
+    }));
+    markers.push(createMarker(stores[stores.length - 1], stores.length - 1));
+    const left = pending.length - i - 1;
+    geoNote = left > 0 ? `locating ${left} new` : '';
+    if (success) saveSnapshot(stores);
+    renderList();
+    console.log(success
+      ? `Geocoded "${s.name}"`
+      : `Geocode failed for "${s.name}" — pinned to NYC center`
+    );
+  }
+  if (gen === loadGen) {
+    geoNote = '';
+    renderList();
+    fitVisibleStores();
+  }
+}
+
+async function loadFromSheet(showLoading=false) {
+  const gen = ++loadGen;
+  geoNote = '';
+  if (showLoading) {
+    document.getElementById('storeList').innerHTML = `
+      <div class="status-msg"><div class="spinner"></div><p>Refreshing store data…</p></div>`;
+  }
+  const btn = document.getElementById('refreshBtn');
+  btn.classList.add('spinning');
+
+  try {
+    const resp = await fetch(CSV_URL + '&cachebust=' + Date.now());
+    if (gen !== loadGen) return;
+    if (!resp.ok) throw new Error('Network error: ' + resp.status);
+    const text = await resp.text();
+    const rows = parseCSV(text);
+    const raw = extractStoresRaw(rows);
+    if (gen !== loadGen) return;
+    if (raw.length === 0) throw new Error('No stores found in sheet');
+
+    const cache = loadGeoCache();
+    const ready = [];
+    const pending = [];
+    raw.forEach((s) => {
+      const resolved = resolveCoords(s, cache);
+      if (resolved) ready.push(resolved);
+      else pending.push(s);
+    });
+
+    stores = ready;
+    activeIdx = null;
+    geoNote = pending.length ? `locating ${pending.length} new` : '';
+    rebuildMarkers();
+    renderList();
+    fitVisibleStores();
+    saveSnapshot(stores);
+    setUpdatedLabel(`Updated ${formatTime(new Date())}`);
+    btn.classList.remove('spinning');
+
+    if (pending.length) await geocodePending(pending, cache, gen);
+  } catch (err) {
+    if (gen !== loadGen) return;
+    console.error('Sheet load error:', err);
+    if (stores.length) {
+      geoNote = 'showing saved locations';
+      renderList();
+      setUpdatedLabel('Could not refresh · showing saved locations');
+    } else {
+      document.getElementById('storeList').innerHTML = `
+        <div class="status-msg">
+          <svg width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.3" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <p>Could not load store data.<br>
+          Please make sure the Google Sheet is shared as<br>
+          <strong>"Anyone with the link can view"</strong><br><br>
+          <button onclick="loadFromSheet(true)" class="btn-shop" style="margin-top:8px">Try Again</button></p>
+        </div>`;
+      document.getElementById('headerCount').textContent = 'Error';
+      document.getElementById('sidebarCount').textContent = 'Could not load';
+    }
+  } finally {
+    if (gen === loadGen) btn.classList.remove('spinning');
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// FILTERS & SEARCH
+// ─────────────────────────────────────────────────────────────
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = btn.dataset.region;
+    if (activeIdx !== null && markers[activeIdx]) {
+      const prev = markers[activeIdx];
+      activeIdx = null;
+      prev.setIcon(makeIcon(false));
+      prev.closePopup();
+    } else {
+      activeIdx = null;
+    }
+    const z = regionZoom[currentFilter] || regionZoom.all;
+    renderList();
+    if (currentFilter === 'all') fitVisibleStores();
+    else map.flyTo(z.c, z.z, { duration: 0.85 });
+  });
+});
+
+document.getElementById('searchInput').addEventListener('input', e => {
+  currentSearch = e.target.value;
+  renderList();
+});
+
+document.getElementById('refreshBtn').addEventListener('click', () => {
+  loadFromSheet(true);
+});
+
+document.getElementById('btn-home').addEventListener('click', () => {
+  closeBasemapMenu();
+  document.querySelectorAll('.filter-btn').forEach((b) => b.classList.toggle('active', b.dataset.region === 'all'));
+  currentFilter = 'all';
+  if (activeIdx !== null && markers[activeIdx]) {
+    markers[activeIdx].setIcon(makeIcon(false));
+    markers[activeIdx].closePopup();
+  }
+  activeIdx = null;
+  renderList();
+  fitVisibleStores();
+});
+document.getElementById('btn-zoom-in').addEventListener('click', () => { closeBasemapMenu(); map.zoomIn(); });
+document.getElementById('btn-zoom-out').addEventListener('click', () => { closeBasemapMenu(); map.zoomOut(); });
+document.getElementById('btn-fullscreen').addEventListener('click', () => {
+  closeBasemapMenu();
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+  else document.exitFullscreen();
+});
+document.addEventListener('fullscreenchange', () => {
+  const btn = document.getElementById('btn-fullscreen');
+  const on = !!document.fullscreenElement;
+  if (btn) {
+    btn.classList.toggle('active', on);
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  }
+  setTimeout(() => map.invalidateSize(), 80);
+});
+document.getElementById('btn-basemap').addEventListener('click', (event) => {
+  event.stopPropagation();
+  toggleBasemapMenu();
+});
+document.getElementById('basemap-menu').addEventListener('click', (event) => {
+  const item = event.target.closest('[data-basemap]');
+  if (!item) return;
+  setBasemap(item.dataset.basemap);
+  closeBasemapMenu();
+});
+document.getElementById('btn-scale').addEventListener('click', () => {
+  closeBasemapMenu();
+  const on = document.getElementById('btn-scale').getAttribute('aria-pressed') !== 'true';
+  setScaleVisible(on);
+});
+document.addEventListener('click', (event) => {
+  if (event.target.closest('#map-toolbar') || event.target.closest('#basemap-menu')) return;
+  closeBasemapMenu();
+});
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape') closeBasemapMenu();
+});
+window.addEventListener('resize', positionBasemapMenu);
+
+map.on('popupclose', () => {
+  if (suppressPopupReset) return;
+  if (activeIdx !== null && markers[activeIdx]) {
+    markers[activeIdx].setIcon(makeIcon(false));
+    const c = document.getElementById(`card-${activeIdx}`);
+    if (c) c.classList.remove('active');
+    activeIdx = null;
+  }
+});
+
+// ─────────────────────────────────────────────────────────────
+// INIT
+// Paint the last saved map immediately, then refresh from the sheet.
+// ─────────────────────────────────────────────────────────────
+const savedMap = loadSnapshot();
+if (savedMap.stores.length) {
+  stores = savedMap.stores;
+  rebuildMarkers();
+  renderList();
+  fitVisibleStores();
+  if (savedMap.savedAt) setUpdatedLabel(`Saved ${formatTime(new Date(savedMap.savedAt))}`);
+}
+loadFromSheet();
+</script>
+</body>
+</html>
